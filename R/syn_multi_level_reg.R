@@ -8,7 +8,7 @@ syn_multi_level_reg <- function(
   psi=100
 ) {
   # 1.) Latent factors: ----
-  u <- rnorm(M, sd=sqrt(psi))
+  u <- matrix(rnorm(M, sd=sqrt(psi)))
   z <- a + b * u
   # Group lengths:
   wgts <- runif(M)
@@ -41,9 +41,9 @@ syn_multi_level_reg <- function(
     data = list(
       X = X,
       y = y,
-      u = u
+      u = u,
+      n_j = n_j
     ),
-    n_j = n_j,
     z = z,
     M = M,
     N = N,
@@ -55,6 +55,5 @@ syn_multi_level_reg <- function(
       b = b
     )
   )
-  class(model$data) <- "multilevel_model"
   return(model)
 }
