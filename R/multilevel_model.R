@@ -25,10 +25,7 @@ multilevel_model <- function(
     u=u,
     U=U,
     group=group,
-    n_j=n_j,
-    var_posterior=var_posterior,
-    mean_posterior=mean_posterior,
-    focs=focs
+    n_j=n_j
   )
   class(model) <- "multilevel_model"
   return(model)

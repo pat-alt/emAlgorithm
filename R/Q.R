@@ -9,8 +9,8 @@ Q.multilevel_model <- function(model, theta, p) {
         X <- matrix(model$X[model$group==j,], ncol = ncol(model$X))
         U <- model$U
         # Latent given previous theta:
-        z_j <- as.numeric(matrix(model$U[j,], ncol = ncol(model$U)) %*% gamma)
-        Z_M <- U %*% gamma
+        z_j <- z[j,] # estimate of z which comes from theta
+        Z_M <- z
         N <- nrow(y)
         M <- nrow(Z_M)
         log_lik <- (-1/2) *

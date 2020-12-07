@@ -9,13 +9,16 @@ em.multilevel_model <- function(
     theta0 <- list(
       beta = qr.solve(model$X, model$y), # initialize as pooled OLS
       phi = runif(1, 0, 100),
-      gamma = matrix(c(0.1,1)),
+      gamma = matrix(rnorm(2)),
       psi = runif(1, 0, 100)
     )
   }
+  theta0[["z"]] <- update_latent(model, theta0)
   converged <- FALSE # initialize convergence condition as false
+  iter_count <- 1
   # Recursion: ----
   while (!converged) {
+    print(iter_count)
     # 1.) E-step: ----
     p <- posterior(model, theta0) # returns and (M x 1) vectors of posteriors
     Q0 <- Q(model, theta0, p) # to compare below
@@ -24,8 +27,10 @@ em.multilevel_model <- function(
     # Recalculate given MAP parameter estimates:
     Q1 <- Q(model, theta, p)
     # Check for convergence:
-    converged <- Q1-Q0 < tol
-    theta0 <- theta
+    converged <- abs(Q1-Q0) < tol
+    theta[["z"]] <- update_latent(model, theta)
+    theta0 <- theta # new theta 0
+    iter_count <- iter_count + 1
   }
   # Allocate and return output:
   output <- list(

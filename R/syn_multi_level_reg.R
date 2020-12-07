@@ -8,11 +8,11 @@ syn_multi_level_reg <- function(
   psi=100
 ) {
   # 1.) Latent factors: ----
-  u <- matrix(rnorm(M, sd=sqrt(psi)))
+  u <- matrix(rnorm(M, sd=sqrt((1/b^2)*psi)))
   z <- a + b * u
   # Group lengths:
   wgts <- runif(M)
-  wgts <- wgts/sum(wgts)
+  wgts <- pmin(wgts/sum(wgts),1)
   n_j <- round(wgts * N)
   to_allocate <- N - sum(n_j)
   while (to_allocate!=0) {

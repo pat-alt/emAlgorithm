@@ -22,7 +22,7 @@ posterior.multilevel_model <- function(
         y <- matrix(model$y[model$group==j])
         X <- matrix(model$X[model$group==j,], ncol = ncol(model$X))
         U <- matrix(model$U[j,], ncol = ncol(model$U))
-        z <- U %*% gamma
+        z_j <- z[j,] # estimate of z which comes from theta
         if (nrow(X) > 1) {
           mu_a <- mean(y) - colMeans(X) %*% beta
         } else {
@@ -30,11 +30,11 @@ posterior.multilevel_model <- function(
         }
         mu_b <- unique(U) %*% gamma
         # Variance:
-        v <- model$var_posterior(phi, psi, n_j[j])
+        v <- var_posterior(phi, psi, n_j[j])
         # Mean:
-        mu <- model$mean_posterior(phi, psi, n_j[j], v, mu_a, mu_b)
+        mu <- mean_posterior(phi, psi, n_j[j], v, mu_a, mu_b)
         # Density:
-        return((2*pi*v)^(-1/2) * exp( (-2*v)^(-1) * crossprod(z-mu) ))
+        return((2*pi*v)^(-1/2) * exp( (-2*v)^(-1) * (z_j-mu)^2 ))
       }
     )
   )
