@@ -2,16 +2,16 @@ syn_multi_level_reg <- function(
   N=10000,
   M=1000,
   beta=c(1,0.1),
-  phi=0.5,
+  phi=0.1,
   a=1,
   b=0.5,
-  psi=0.7,
+  psi=0.01,
   seed=123
 ) {
   set.seed(seed)
   # 1.) Latent factors: ----
   u <- matrix(rnorm(M))
-  z <- a + b * u + rnorm(M, sd=sqrt(psi))
+  z <- a + b * u + rnorm(n=nrow(u),sd=sqrt(psi))
   # Group lengths:
   wgts <- runif(M)
   wgts <- wgts/sum(wgts)
@@ -38,7 +38,7 @@ syn_multi_level_reg <- function(
   # 2.) Output: ----
   K <- length(beta)
   X <- matrix(rnorm(N*K), nrow=N)
-  y <- Z + X %*% beta + rnorm(N,sd=sqrt(phi))
+  y <- Z + X %*% beta + rnorm(n=nrow(X),sd=sqrt(phi))
   model <- list(
     data = list(
       X = X,
