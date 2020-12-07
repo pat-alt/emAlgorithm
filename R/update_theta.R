@@ -1,36 +1,30 @@
 update_theta.multilevel_model <- function(model, theta, p) {
+  # Gather:
   n_j <- model$n_j
   list2env(theta, envir = environment())
-  # beta: ----
   X <- model$X
   y <- model$y
   N <- nrow(y)
   M <- length(n_j)
-  Z_N <- matrix(rep.int(z, times=n_j))
-  beta_map <- qr.solve(crossprod(X), (crossprod(X,y) - crossprod(X, Z_N)))
+  U <- model$U
+  # Posterior moments:
+  mu_M <- matrix(p[,"mu"])
+  v_M <- matrix(p[,"v"])
+  mu_N <- matrix(rep.int(mu_M, times=n_j))
+  v_N <- matrix(rep.int(v_M, times=n_j))
+  # beta: ----
+  beta_map <- qr.solve(crossprod(X), (crossprod(X,y) - crossprod(X, mu_N)))
   theta$beta <- beta_map # update
   # phi: ----
-  wgts <- p/sum(p)
-  e_sq <- matrix(
-    sapply(
-      1:length(n_j),
-      function(j) {
-        y <- matrix(model$y[model$group==j])
-        X <- matrix(model$X[model$group==j,], ncol = ncol(model$X))
-        z_j <- z[j,]
-        e_sq <- crossprod(y - z_j - X %*% beta)
-        return(e_sq)
-      }
-    )
-  )
-  phi_map <- (1/N) * sum(wgts * e_sq)
+  phi_map <- (1/N) *
+    (crossprod(y-X%*%beta_map) - 2 * crossprod(y - X %*% beta_map, mu_N) + sum( mu_N^2 + v_N ))
   theta$phi <- phi_map # update phi
   # gamma: ----
-  Z_M <- z
-  gamma_map <- qr.solve(crossprod(model$U), crossprod(model$U,Z_M))
+  gamma_map <- qr.solve(crossprod(U), crossprod(U,mu_M))
   theta$gamma <- gamma_map # update gamma
   # psi: ----
-  psi_map <- (1/M) * crossprod(Z_M - model$U %*% gamma_map)
+  psi_map <- (1/M) *
+    (crossprod(U %*% gamma_map) + sum( mu_M^2 + v_M ) - 2 * crossprod(U %*% gamma_map, mu_M))
   theta$psi <- psi_map # update psi
   return(theta)
 }

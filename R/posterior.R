@@ -2,6 +2,8 @@ posterior.multilevel_model <- function(
   model,
   theta
 ) {
+  n_j <- model$n_j
+  list2env(theta, envir = environment())
   # Posterior density ----
   var_posterior <- function(phi, psi, n_j) {
     v <- (n_j*phi^(-1) + psi^(-1))^(-1)
@@ -13,16 +15,13 @@ posterior.multilevel_model <- function(
       v * psi^(-1) * (mu_b)
   }
   # Compute density ----
-  n_j <- model$n_j
-  list2env(theta, envir = environment())
-  p <- matrix(
+  p <- t(
     sapply(
       1:length(n_j),
       function(j) {
         y <- matrix(model$y[model$group==j])
         X <- matrix(model$X[model$group==j,], ncol = ncol(model$X))
         U <- matrix(model$U[j,], ncol = ncol(model$U))
-        z_j <- z[j,] # estimate of z which comes from theta
         if (nrow(X) > 1) {
           mu_a <- mean(y) - colMeans(X) %*% beta
         } else {
@@ -34,7 +33,7 @@ posterior.multilevel_model <- function(
         # Mean:
         mu <- mean_posterior(phi, psi, n_j[j], v, mu_a, mu_b)
         # Density:
-        return((2*pi*v)^(-1/2) * exp( (-2*v)^(-1) * (z_j-mu)^2 ))
+        return(c(v=v, mu=mu))
       }
     )
   )

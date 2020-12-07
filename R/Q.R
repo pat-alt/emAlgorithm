@@ -1,26 +1,23 @@
 Q.multilevel_model <- function(model, theta, p) {
   n_j <- model$n_j
   list2env(theta, envir = environment())
-  log_lik <- matrix(
-    sapply(
-      1:length(n_j),
-      function(j) {
-        y <- matrix(model$y[model$group==j])
-        X <- matrix(model$X[model$group==j,], ncol = ncol(model$X))
-        U <- model$U
-        # Latent given previous theta:
-        z_j <- z[j,] # estimate of z which comes from theta
-        Z_M <- z
-        N <- nrow(y)
-        M <- nrow(Z_M)
-        log_lik <- (-1/2) *
-          ( N * log(2*pi*phi) + phi^(-1) * crossprod(y - z_j - X %*% beta)
-            + M * log(2*pi*psi) + psi^(-1) * crossprod(Z_M - U %*% gamma) )
-        return(log_lik)
-      }
-    )
-  )
-  return(t(log_lik) %*% p)
+  y <- model$y
+  X <- model$X
+  U <- model$U
+  N <- nrow(y)
+  M <- length(n_j)
+  # Posterior moments:
+  mu_M <- matrix(p[,"mu"])
+  v_M <- matrix(p[,"v"])
+  mu_N <- matrix(rep.int(mu_M, times=n_j))
+  v_N <- matrix(rep.int(v_M, times=n_j))
+  # Compute:
+  A <- N * log(2*pi*phi)
+  B <- phi^(-1) * ( crossprod(y - X %*% beta) - 2 * crossprod(y - X %*% beta, mu_N) + sum( mu_N^2 + v_N ) )
+  C <- M * log(2*pi*psi)
+  D <- psi^(-1) * ( crossprod(U %*% gamma) + sum( mu_M^2 + v_M ) - 2 * crossprod(U %*% gamma, mu_M))
+  value <- (-1/2) * ( A + B + C + D )
+  return(value)
 }
 
 Q <- function(model, theta, p) {

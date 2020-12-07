@@ -13,22 +13,23 @@ em.multilevel_model <- function(
       psi = runif(1, 0, 100)
     )
   }
-  theta0[["z"]] <- update_latent(model, theta0)
+  # theta0[["z"]] <- update_latent(model, theta0)
   converged <- FALSE # initialize convergence condition as false
   iter_count <- 1
   # Recursion: ----
   while (!converged) {
     print(iter_count)
     # 1.) E-step: ----
-    p <- posterior(model, theta0) # returns and (M x 1) vectors of posteriors
-    Q0 <- Q(model, theta0, p) # to compare below
+    posterior_moments <- posterior(model, theta0) # returns and (M x 1) vectors of posteriors
+    Q0 <- Q(model, theta0, posterior_moments) # to compare below
     # 2.) M-step: ----
-    theta <- update_theta(model, theta0, p)
+    theta <- update_theta(model, theta0, posterior_moments)
     # Recalculate given MAP parameter estimates:
-    Q1 <- Q(model, theta, p)
+    Q1 <- Q(model, theta, posterior_moments)
     # Check for convergence:
-    converged <- abs(Q1-Q0) < tol
-    theta[["z"]] <- update_latent(model, theta)
+    print(sprintf("Improvement of %0.2f",Q1-Q0))
+    converged <- Q1-Q0 < tol
+    # theta[["z"]] <- update_latent(model, theta)
     theta0 <- theta # new theta 0
     iter_count <- iter_count + 1
   }
