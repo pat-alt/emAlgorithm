@@ -15,15 +15,15 @@ syn_multi_level_reg <- function(
   # Group lengths:
   wgts <- runif(M)
   wgts <- wgts/sum(wgts)
-  n_j <- pmax(round(wgts * N),10)
+  n_j <- pmax(round(wgts * N),1)
   to_allocate <- N - sum(n_j)
   while (to_allocate!=0) {
     if (to_allocate > 0) {
-      idx <- sample(M,1)
+      idx <- which.min(n_j)
       n_j[idx] <- n_j[idx] + 1
       to_allocate <- to_allocate - 1
     } else {
-      idx <- sample(M,1)
+      idx <- which.max(n_j)
       n_j[idx] <- n_j[idx] - 1
       to_allocate <- to_allocate + 1
     }
@@ -59,3 +59,5 @@ syn_multi_level_reg <- function(
   )
   return(model)
 }
+
+syn_data <- syn_multi_level_reg()
