@@ -5,7 +5,7 @@ syn_multi_level_reg <- function(
   phi=0.1,
   a=1,
   b=0.5,
-  psi=0.01,
+  psi=0.05,
   seed=123
 ) {
   set.seed(seed)

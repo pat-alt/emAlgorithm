@@ -3,7 +3,8 @@ em.multilevel_model <- function(
   model,
   theta0=NULL,
   tol=1e-9,
-  print_progress=T
+  print_progress=T,
+  max_iter=100
 ) {
   # Initialization: ----
   if (is.null(theta0)) {
@@ -17,7 +18,7 @@ em.multilevel_model <- function(
   converged <- FALSE # initialize convergence condition as false
   iter_count <- 1
   # Recursion: ----
-  while (!converged) {
+  while (!converged & iter_count <= max_iter) {
     if (print_progress) {
       print(iter_count)
     }
@@ -50,7 +51,8 @@ em <- function(
   model,
   theta0=NULL,
   tol=1e-9,
-  print_progress=T
+  print_progress=T,
+  max_iter=100
 ) {
   UseMethod("em")
 }
