@@ -17,8 +17,9 @@ multilevel_model <- function(
 ) {
   # Group index:
   group <- rep.int(1:nrow(u), times=n_j)
-  u <- matrix(rep.int(u, times=n_j))
-  U <- cbind(1, unique(u))
+  U <- cbind(1, u)
+  # u <- matrix(rep.int(u, times=n_j))
+  u <- u[group,]
   model <- list(
     X=X,
     y=y,

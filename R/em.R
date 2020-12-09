@@ -4,14 +4,14 @@ em.multilevel_model <- function(
   theta0=NULL,
   tol=1e-9,
   print_progress=T,
-  max_iter=100
+  max_iter=1000
 ) {
   # Initialization: ----
   if (is.null(theta0)) {
     theta0 <- list(
       beta = qr.solve(model$X, model$y), # initialize as pooled OLS
       phi = runif(1, 0, 100),
-      gamma = matrix(rnorm(2)),
+      gamma = matrix(rnorm(ncol(model$U))),
       psi = runif(1, 0, 100)
     )
   }
