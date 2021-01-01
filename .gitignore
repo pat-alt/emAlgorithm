@@ -37,3 +37,7 @@ vignettes/*.pdf
 
 # R Environment Variables
 .Renviron
+
+
+.ipynb_checkpoints/multi_level_reg_feedback-checkpoint.ipynb
+multi_level_reg_feedback.ipynb
